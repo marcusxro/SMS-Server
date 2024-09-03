@@ -31,7 +31,10 @@ if (cluster.isMaster) {
 } else {
   // Worker processes
   app.get('/', (req, res) => {
-    res.send('Hello World!');
+    res.send(`   <div>
+        <h1>CONNECTED TO SERVER</h1>
+        <p>Worker ${process.pid} is listening to port ${port}</p>
+      </div>`);
   });
 
   const server = app.listen(port, () => {
