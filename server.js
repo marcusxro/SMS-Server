@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const port = 8080;
+const port = process.env.PORT || 8080;
 
 // Serve a simple HTML page at the root URL
 app.get('/', (req, res) => {
@@ -21,6 +21,6 @@ app.get('/', (req, res) => {
 });
 
 // Start the server
-app.listen(8080, () => {
-  console.log(`Server is running at http://localhost:${8080}`);
+app.listen(port, () => {
+  console.log(`Server is running at http://localhost:${port}`);
 });
