@@ -1,51 +1,26 @@
 const express = require('express');
-const cluster = require('cluster');
-const http = require('http');
-const os = require('os');
-
 const app = express();
 const port = 8080;
-const numCPUs = os.cpus().length;
 
-if (cluster.isMaster) {
-  console.log(`Master ${process.pid} is running`);
+// Serve a simple HTML page at the root URL
+app.get('/', (req, res) => {
+  res.send(`
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Simple Express Server</title>
+    </head>
+    <body>
+        <h1>Hello from Express!</h1>
+        <p>This is a simple HTML page served by Express.</p>
+    </body>
+    </html>
+  `);
+});
 
-  // Fork workers
-  for (let i = 0; i < numCPUs; i++) {
-    cluster.fork();
-  }
-
-  cluster.on('exit', (worker, code, signal) => {
-    console.log(`Worker ${worker.process.pid} died`);
-    // Optionally, restart the worker
-    cluster.fork();
-  });
-
-  // Graceful shutdown for master
-  process.on('SIGTERM', () => {
-    console.log('Master process shutting down gracefully');
-    Object.values(cluster.workers).forEach(worker => worker.kill());
-    setTimeout(() => process.exit(0), 10000); // Wait for workers to close
-  });
-
-} else {
-  // Worker processes
-  app.get('/', (req, res) => {
-    res.send(`   <div>
-        <h1>CONNECTED TO SERVER</h1>
-        <p>Worker ${process.pid} is listening to port ${port}</p>
-      </div>`);
-  });
-
-  const server = app.listen(port, () => {
-    console.log(`Worker ${process.pid} listening on port ${port}`);
-  });
-
-  // Graceful shutdown for workers
-  process.on('SIGTERM', () => {
-    server.close(() => {
-      console.log(`Worker ${process.pid} closed connections`);
-      process.exit();
-    });
-  });
-}
+// Start the server
+app.listen(port, () => {
+  console.log(`Server is running at http://localhost:${port}`);
+});
